@@ -1,0 +1,2 @@
+include ':BfcPermissionDemo'
+include ':BfcPermissionSDK'

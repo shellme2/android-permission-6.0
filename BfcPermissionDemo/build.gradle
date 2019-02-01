@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+android {
+    compileSdkVersion bfcBuildConfig.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    defaultConfig {
+        applicationId "com.eebbk.bfc.demo.permission"
+        minSdkVersion bfcBuildConfig.minSdkVersion
+        targetSdkVersion bfcBuildConfig.targetSdkVersion
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+    //对app签名
+    signingConfigs {
+        debug {
+            keyAlias 'imoo'
+            keyPassword 'bbkeebbklinux123'
+            storeFile file('./../key/imoo.jks')
+            storePassword 'bbkeebbk'
+        }
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+}
+
+// 修改apk名称，并放到apk目录下
+android.applicationVariants.all { variant ->
+    variant.assemble << {
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null) {
+                println "输入文件位置： " + outputFile
+                def fileName = outputFile.name.replace("-release.apk", "-unencrypted.apk")
+                def toFile = new File("./../apk/")
+                println "输出文件位置： " + toFile
+
+                copy{
+                    from outputFile
+                    into toFile
+                    rename{
+                        fileName
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile project(':BfcPermissionSDK')
+    compile bfcBuildConfig.deps["bfc-common"]
+
+    compile rootProject.ext.dependencies.'support-v4'
+    compile rootProject.ext.dependencies.'appcompat-v7'
+    compile rootProject.ext.dependencies.'support-design'
+    compile rootProject.ext.dependencies.'butterknife'
+
+    // 检测
+    debugCompile bfcBuildConfig.deps["bfc-leakcanary"]
+    releaseCompile bfcBuildConfig.deps["bfc-leakcanary-no-op"]
+    debugCompile bfcBuildConfig.deps["bfc-blockcanary"]
+    releaseCompile bfcBuildConfig.deps["bfc-blockcanary-no-op"]
+}

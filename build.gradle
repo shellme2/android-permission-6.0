@@ -1,0 +1,30 @@
+apply from: "./config.gradle"
+apply from: "http://172.28.2.93/bfc/Bfc/raw/develop/common-config/bfc-config.gradle"
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'me.tatarka:gradle-retrolambda:3.3.1'
+    }
+}
+
+allprojects {
+    repositories {
+        // 增加私有Maven快照仓库
+        maven { url bfcBuildConfig.MAVEN_SNAPSHOT_URL }
+        // 增加私有Maven正式发布仓库
+        maven { url bfcBuildConfig.MAVEN_URL }
+        // 灰度版本仓库
+        maven { url bfcBuildConfig.MAVEN_RC_URL }
+
+        maven { url 'http://repo2.maven.org/maven2/' }
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
